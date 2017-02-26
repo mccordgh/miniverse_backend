@@ -1,0 +1,24 @@
+{% extends 'adventure_creator/index.html' %}
+{% block content %}
+<h1>CREATE item</h1>
+
+{% if info %}
+  <h2>{{info}}</h2>
+{% endif %}
+
+  <form id="create_item_form" method="post" action="/create_item/">
+      {% csrf_token %}
+      {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+      {% endfor %}
+      {% for field in form.visible_fields %} <br>
+          {{ field.name }}
+          {{ field.errors }}
+          {{ field.help_text }}
+          {{ field }}
+      {% endfor %}
+      </br>
+      <input type="submit" name="submit" value="Add Item to Database" />
+  </form>
+
+{% endblock %}

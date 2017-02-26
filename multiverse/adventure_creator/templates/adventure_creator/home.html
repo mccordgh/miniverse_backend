@@ -1,0 +1,20 @@
+{% extends 'adventure_creator/index.html' %}
+{% block content %}
+
+	<h1>What would you like to do?</h1>
+	<br />
+	<a href="{% url 'view_my_adventures' %}">View my Adventures</a>
+	<br />
+	<ul>
+		<li>
+			<a href="{% url 'create_adventure' %}">Create an Adventure</a>
+		</li>
+		<li>
+			<a href="{% url 'create_item' %}">Create an Item</a>
+		</li>
+		<li>
+			<a href="{% url 'create_interactive' %}">Create an Interactive</a>
+		</li>
+	</ul>
+
+{% endblock %}

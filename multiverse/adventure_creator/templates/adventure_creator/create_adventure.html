@@ -1,0 +1,22 @@
+{% extends 'adventure_creator/index.html' %}
+{% block content %}
+	
+	<h1>Create Adventure</h1>
+
+	<br />	
+
+	<form id="create_adventure_form" method="post" action="/create_adventure/">
+	    {% csrf_token %}
+	    {% for hidden in form.hidden_fields %}
+	        {{ hidden }}
+	    {% endfor %}
+	    {% for field in form.visible_fields %} <br>
+	        {{ field.errors }}
+	        {{ field.help_text }}
+	        {{ field }}
+	    {% endfor %}
+	    </br>
+	    <input type="submit" name="submit" value="Create Adventure" />
+	</form>
+
+{% endblock %}
