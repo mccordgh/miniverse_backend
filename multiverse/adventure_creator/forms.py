@@ -7,7 +7,7 @@ class CreateAdventureForm(forms.ModelForm):
 
     class Meta:
         model = models.Adventure
-        fields = ('user', 'title',)
+        fields = ('title',)
 
 class CreateRoomForm(forms.ModelForm):
     description = forms.CharField(max_length=500, help_text="Room Description:")
