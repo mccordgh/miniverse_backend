@@ -1,45 +1,39 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.urls import reverse
 
 class Adventure(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=64)
+    rating = models.IntegerField()
+    published = models.BooleanField()
 
     def __str__(self):
         return '{}'.format(self.title)
 
-class Exit(models.Model):
-    direction = models.CharField(max_length=1)
-
-    def __str__(self):
-        return '{}'.format(self.direction)
-
 class Item(models.Model):
     name = models.CharField(max_length=64)
-    description = models.CharField(max_length=128)
+    description = models.CharField(max_length=256)
 
     def __str__(self):
         return '{}'.format(self.name)
 
-
 class Interactive(models.Model):
     name = models.CharField(max_length=64)
-    description = models.CharField(max_length=128)
+    description = models.CharField(max_length=256)
     action = models.CharField(max_length=32)
-    activator = models.OneToOneField(Item, on_delete=models.CASCADE)
+    activator = models.OneToOneField(Item, on_delete=models.CASCADE, related_name='activator_item', null=True)
+    reward = models.OneToOneField(Item, on_delete=models.CASCADE, related_name='rewarded_item', blank=True, null=True)
 
     def __str__(self):
         return '{}'.format(self.name)
 
 class Room(models.Model):
-    description = models.CharField(max_length=500)
+    room_number = models.IntegerField()
+    description = models.CharField(max_length=512)
     adventure = models.ForeignKey(Adventure, on_delete=models.CASCADE)
-    item = models.OneToOneField(Item, on_delete=models.CASCADE)
-    interactive = models.OneToOneField(Interactive, on_delete=models.CASCADE)
-    exit = models.ManyToManyField(Exit)
+    item = models.OneToOneField(Item, on_delete=models.CASCADE, blank=True, null=True)
+    interactive = models.OneToOneField(Interactive, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return 'ROOM __str__'
-
+        return 'Room #{} from {}'.format(self.room_number, self.adventure)
 

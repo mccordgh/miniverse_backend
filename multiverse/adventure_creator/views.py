@@ -1,112 +1,80 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import logout, login, authenticate
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
-from adventure_creator import forms
+from django.http import HttpResponse, JsonResponse
+from adventure_creator import serializers, models
+from rest_framework import viewsets, generics
+from rest_framework.permissions import IsAuthenticated, AllowAny
+import json
 
-# Base view for /
-def index_view(request):
-    # Auto logging in my superuser for coding purposes!!
-    user = authenticate(
-        username='matthew',
-        password='pass1234'
-    )
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
 
-    # Check if user authenticated
-    if user is not None:
-        login(request=request, user=user)
-        return render(request, 'adventure_creator/home.html', {'username': user})
-    else:
-        return HttpResponse('invalid user')
+class AdventureViewSet(viewsets.ModelViewSet):
+    queryset = models.Adventure.objects.all()
+    serializer_class = serializers.AdventureSerializer
 
-# view for creating an adventure using create_adventure.html template
-def create_adventure_view(request):
-    form = forms.CreateAdventureForm()
+class GetAdventureViewSet(viewsets.ModelViewSet):
+    queryset = models.Adventure.objects.all() 
+    serializer_class = serializers.AdventureSerializer
 
-    if request.method == 'POST':
-        form = forms.CreateAdventureForm(request.POST)
+class InteractiveViewSet(viewsets.ModelViewSet):
+    queryset = models.Interactive.objects.all()
+    serializer_class = serializers.InteractiveSerializer
 
-        if form.is_valid():
-            form.save(commit=True)
-            form = forms.CreateRoomForm()
-            return render(request, 'adventure_creator/create_room.html', {
-                'username': request.user,
-                'form': form
-                })
-        else:
-            print(form.errors)
-    return render(request, 'adventure_creator/create_adventure.html', {
-        'username': request.user,
-        'form': form
+class ItemViewSet(viewsets.ModelViewSet):
+    queryset = models.Item.objects.all()
+    serializer_class = serializers.ItemSerializer
+
+class RoomViewSet(viewsets.ModelViewSet):
+    queryset = models.Room.objects.all()
+    serializer_class = serializers.RoomSerializer
+
+class LoginView(generics.RetrieveAPIView):
+    permission_classes = (AllowAny,)
+
+
+    error_messages = {
+        'invalid': "Invalid username or password",
+        'disabled': "Sorry, this account is suspended",
+    }
+
+    def _error_response(self, message_key):
+        data = json.dumps({
+            'success': False,
+            'message': self.error_messages[message_key],
+            'user_id': None,
         })
 
-# view for creating all the rooms in an adventure
-def create_room_view(request):
-    form = forms.CreateRoomForm()
+    def post(self,request):
+        req_body = json.loads(request.body.decode())
+        username = req_body['username']
+        password = req_body['password']
+        user = authenticate(username=username, password=password)
 
-    if request.method == 'POST':
-        form = forms.CreateRoomForm(request.POST)
-
-        if form.is_valid():
-            form.save(commit=True)
-            info = "Room saved to Adventure"
-            form = forms.CreateRoomForm()
-            return render(request, 'adventure_creator/create_room.html', {
-                'username': request.user,
-                'form': form,
-                'info': info
+        success = False
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                data = json.dumps({
+                    'success': True,
+                    'username': user.username,
+                    'email': user.email,
                 })
-        else:
-            print(form.errors)
-    return render(request, 'adventure_creator/create_room.html', {'username': request.user})
+                return HttpResponse(data, content_type='application/json')
 
-# view for creating items to use in your rooms
-def create_item_view(request):
-    form = forms.CreateItemForm()
+            return HttpResponse(self._error_response('disabled'), content_type='application/json')
+        return HttpResponse(self._error_response('invalid'), content_type='application/json')
 
-    if request.method == 'POST':
-        form = forms.CreateItemForm(request.POST)
+def get_adventure(request, pk):
+    adventure = models.Adventure.objects.all().values()
+    interactives = models.Interactive.objects.all().values()
+    items = models.Item.objects.all().values()
+    rooms = models.Room.objects.all().values()
 
-        if form.is_valid():
-            form.save(commit=True)
-            info = "Item saved to database"
-            form = forms.CreateItemForm()
-            return render(request, 'adventure_creator/create_item.html', {
-                'username': request.user,
-                'form': form,
-                'info': info
-                })
-        else:
-            print(form.errors)
-    return render(request, 'adventure_creator/create_item.html', {
-                'username': request.user,
-                'form': form
-                })
-
-# view for creating interactives to use in your rooms
-def create_interactive_view(request):
-    form = forms.CreateInteractiveForm()
-
-    if request.method == 'POST':
-        form = forms.CreateInteractiveForm(request.POST)
-
-        if form.is_valid():
-            form.save(commit=True)
-            info = "interactive saved to database"
-            form = forms.CreateInteractiveForm()
-            return render(request, 'adventure_creator/create_interactive.html', {
-                'username': request.user,
-                'form': form,
-                'info': info
-                })
-        else:
-            print(form.errors)
-    return render(request, 'adventure_creator/create_interactive.html', {
-                'username': request.user,
-                'form': form
-                })
-
-# view for listing all adventures of current user
-def adventures_view(request):
-    return render(request, 'adventure_creator/view_my_adventures.html', {'username': request.user})
-
+    return JsonResponse({
+        "adventure": list(adventure),
+        "interactives": list(interactives),
+        "items": list(items),
+        "rooms": list(rooms)
+    })
