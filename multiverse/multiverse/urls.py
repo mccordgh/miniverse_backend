@@ -15,6 +15,6 @@ urlpatterns = [
     url(r'^get_adventure/(?P<pk>\d+)', views.get_adventure, name='get_adventure'),
     url(r'^admin/', admin.site.urls),
     url(r'^login$', views.LoginView.as_view()),
-    url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': '/login'}),
+    url(r'^logout$', views.LogOutView.as_view()),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

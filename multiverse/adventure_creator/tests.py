@@ -3,6 +3,7 @@ from django.test.utils import setup_test_environment
 from django.contrib.auth.models import User
 from adventure_creator import models
 
+
 class AdventureModelTest(TestCase):
 
     def test_can_create_adventure_instance(self):
@@ -20,16 +21,6 @@ class AdventureModelTest(TestCase):
         self.assertIsInstance(adventure, models.Adventure)
         self.assertIsInstance(adventure.user, User)
         self.assertEqual(adventure.title, 'Awesome Adventure Dude')
-
-
-class ExitModelTest(TestCase):
-
-    def test_can_create_exit_instance(self):
-        exit = models.Exit(
-            direction='N'
-        )
-        self.assertIsInstance(exit, models.Exit)
-        self.assertEqual(exit.direction, 'N')
 
 class ItemModelTest(TestCase):
 

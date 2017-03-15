@@ -1,7 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
 class Adventure(models.Model):
+    '''
+    The Adventure Model stores, or is a reference to, all information for the current adventure
+    '''
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=64)
     rating = models.IntegerField()
@@ -11,6 +16,9 @@ class Adventure(models.Model):
         return '{}'.format(self.title)
 
 class Item(models.Model):
+    '''
+    The Item model defines Items that the Player will acquire throughout the adventure.
+    '''
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
 
@@ -18,6 +26,9 @@ class Item(models.Model):
         return '{}'.format(self.name)
 
 class Interactive(models.Model):
+    '''
+    The Interactive model defines Items that can be interacted with, through using another Item on it.
+    '''
     name = models.CharField(max_length=64)
     description = models.CharField(max_length=256)
     action = models.CharField(max_length=32)
@@ -28,6 +39,9 @@ class Interactive(models.Model):
         return '{}'.format(self.name)
 
 class Room(models.Model):
+    '''
+    The Room model defines each room in an adventure, and what items or interactives it might contain.
+    '''
     room_number = models.IntegerField()
     description = models.CharField(max_length=512)
     adventure = models.ForeignKey(Adventure, on_delete=models.CASCADE)

@@ -7,30 +7,44 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 import json
 
 class UserViewSet(viewsets.ModelViewSet):
+    '''
+    The user view shows all users
+    '''
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
 
 class AdventureViewSet(viewsets.ModelViewSet):
+    '''
+    The adventure view shows all adventures
+    '''
     queryset = models.Adventure.objects.all()
     serializer_class = serializers.AdventureSerializer
 
-class GetAdventureViewSet(viewsets.ModelViewSet):
-    queryset = models.Adventure.objects.all() 
-    serializer_class = serializers.AdventureSerializer
-
 class InteractiveViewSet(viewsets.ModelViewSet):
+    '''
+    The interactive view shows all interactives for an adventure
+    '''
     queryset = models.Interactive.objects.all()
     serializer_class = serializers.InteractiveSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
+    '''
+    The Item view shows all items for an adventure
+    '''
     queryset = models.Item.objects.all()
     serializer_class = serializers.ItemSerializer
 
 class RoomViewSet(viewsets.ModelViewSet):
+    '''
+    The Room view shows all rooms for an adventure
+    '''
     queryset = models.Room.objects.all()
     serializer_class = serializers.RoomSerializer
 
 class LoginView(generics.RetrieveAPIView):
+    '''
+    The Login view is used to handle logging in of users
+    '''
     permission_classes = (AllowAny,)
 
 
@@ -66,7 +80,13 @@ class LoginView(generics.RetrieveAPIView):
             return HttpResponse(self._error_response('disabled'), content_type='application/json')
         return HttpResponse(self._error_response('invalid'), content_type='application/json')
 
+class LogOutView(generics.RetrieveAPIView):
+    pass
+
 def get_adventure(request, pk):
+    '''
+    The get_adventure view returns all necessary information for an adventure, given the primary key of that adventure
+    '''
     adventure = models.Adventure.objects.all().values()
     interactives = models.Interactive.objects.all().values()
     items = models.Item.objects.all().values()
