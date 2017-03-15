@@ -87,14 +87,35 @@ def get_adventure(request, pk):
     '''
     The get_adventure view returns all necessary information for an adventure, given the primary key of that adventure
     '''
-    adventure = models.Adventure.objects.all().values()
+    adventure = models.Adventure.objects.all().filter(pk=pk).values()
+    rooms = models.Room.objects.all().filter(adventure_id=pk).values()
     interactives = models.Interactive.objects.all().values()
     items = models.Item.objects.all().values()
-    rooms = models.Room.objects.all().values()
+    
+    interactives_list = []
+    for room in rooms:
+        for interactive in interactives:
+            if interactive['id'] == room['interactive_id']:
+                interactives_list.append(interactive)
+            
+    items_list = []
+    for room in rooms:
+        for item in items:
+            if item['id'] == room['item_id']:
+                items_list.append(item)
+
+    for interactive in interactives_list:
+        for item in items:
+            if item['id'] == interactive['reward_id']:
+                items_list.append(item)
+            
 
     return JsonResponse({
         "adventure": list(adventure),
-        "interactives": list(interactives),
-        "items": list(items),
+        "interactives": interactives_list,
+        "items": items_list,
         "rooms": list(rooms)
     })
+
+def get_all_adventures(request):
+    pass
