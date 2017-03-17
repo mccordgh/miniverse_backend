@@ -118,4 +118,6 @@ def get_adventure(request, pk):
     })
 
 def get_all_adventures(request):
-    pass
+    return JsonResponse({
+        "adventures": list(models.Adventure.objects.all().values())
+        })

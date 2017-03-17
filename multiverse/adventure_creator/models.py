@@ -6,7 +6,6 @@ class Adventure(models.Model):
     '''
     The Adventure Model stores, or is a reference to, all information for the current adventure
     '''
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=64)
     rating = models.IntegerField()
