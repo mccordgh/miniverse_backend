@@ -15,7 +15,5 @@ urlpatterns = [
     url(r'^get_adventure/(?P<pk>\d+)', views.get_adventure, name='get_adventure'),
     url(r'^get_all_adventures/', views.get_all_adventures, name='get_all_adventures'),
     url(r'^admin/', admin.site.urls),
-    url(r'^login$', views.LoginView.as_view()),
-    url(r'^logout$', views.LogOutView.as_view()),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
